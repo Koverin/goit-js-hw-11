@@ -18,7 +18,7 @@ export default class LoadMoreBtn {
   }
 
   show() {
-    this.refs.button.style.display = 'block';
+    this.refs.button.style.display = 'inline-flex';
     this.refs.button.classList.remove('is-hidden');
   }
 }

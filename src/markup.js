@@ -3,15 +3,15 @@ export default function createMarkupList(hits) {
     .map(
       ({
         webformatURL,
-        // largeImageURL,
+        largeImageURL,
         tags,
         likes,
         views,
         comments,
         downloads,
       }) =>
-        `<div class="photo-card">
-  <img src="${webformatURL}" alt="${tags}" loading="lazy" />
+        `<div class="gallery"> <div class="photo-card">
+  <a href="${largeImageURL}" class="link" ><img class=gallery-img src="${webformatURL}" alt="${tags}" loading="lazy" /></a>
   <div class="info">
     <p class="info-item">
       <b>Likes</b> ${likes}
@@ -26,6 +26,7 @@ export default function createMarkupList(hits) {
       <b>Downloads</b> ${downloads}
     </p>
   </div>
+</div>
 </div>`
     )
     .join('');

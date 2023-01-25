@@ -1,4 +1,6 @@
 // import axios from 'axios';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 import createMarkup from './markup';
 import Notiflix from 'notiflix';
 import ApiServer from './api';
@@ -17,6 +19,7 @@ const loadMoreBtn = new LoadMoreBtn({
 console.log(loadMoreBtn);
 
 const apiServer = new ApiServer();
+const lightbox = new SimpleLightbox('.gallery a');
 
 refs.searchForm.addEventListener('submit', onSearch);
 loadMoreBtn.refs.button.addEventListener('click', onClickBtn);
@@ -27,23 +30,38 @@ async function onSearch(evt) {
 
   if (apiServer.query === '') {
     return;
-  } else if (apiServer.totalHits >= 500) {
-    Notiflix.Notify.failure('Oops, there is no country with that name');
   }
-
-  loadMoreBtn.show();
   clearGallery();
-  apiServer.updatePage();
-  apiServer.requestApi().then(requestApiMarkup);
-  apiServer.incrementPage();
+  try {
+    await apiServer.requestApi().then(requestApiMarkup);
+    if (apiServer.totalHits !== 0) {
+      Notiflix.Notify.success(
+        `Hooray! We found ${apiServer.totalHits} images.`
+      );
+    }
+    lightbox.refresh();
+    loadMoreBtn.show();
+    apiServer.updatePage();
+    // apiServer.requestApi().then(requestApiMarkup);
+    apiServer.incrementPage();
+    emptyArray();
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 async function onClickBtn() {
   if (apiServer.query === '') {
     return;
+  } else if (apiServer.totalHits <= apiServer.totalHitsMessage()) {
+    Notiflix.Notify.info(
+      `We're sorry, but you've reached the end of search results.`
+    );
+    loadMoreBtn.hide();
+    return;
   }
-
   apiServer.requestApi().then(requestApiMarkup);
+  lightbox.refresh();
   apiServer.incrementPage();
 }
 
@@ -53,4 +71,13 @@ function requestApiMarkup(hits) {
 
 function clearGallery() {
   refs.gallery.innerHTML = '';
+}
+
+function emptyArray() {
+  if (apiServer.totalHits === 0) {
+    Notiflix.Notify.failure(
+      'Sorry, there are no images matching your search query. Please try again.'
+    );
+    loadMoreBtn.hide();
+  }
 }
