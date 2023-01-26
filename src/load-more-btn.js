@@ -22,12 +22,3 @@ export default class LoadMoreBtn {
     this.refs.button.classList.remove('is-hidden');
   }
 }
-
-//   enable() {
-//     this.refs.button.disabled = false;
-//      this.refs.loadMore.textContent = 'Load more';
-//   }
-
-//   disabled() {
-//     this.refs.button.disabled = true;
-//   }

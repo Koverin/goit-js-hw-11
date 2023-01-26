@@ -26,23 +26,24 @@ loadMoreBtn.refs.button.addEventListener('click', onClickBtn);
 
 async function onSearch(evt) {
   evt.preventDefault();
-  apiServer.query = evt.currentTarget.elements.searchQuery.value;
+  apiServer.query = evt.currentTarget.elements.searchQuery.value.trim();
 
   if (apiServer.query === '') {
     return;
   }
   clearGallery();
+  apiServer.updatePage();
   try {
-    await apiServer.requestApi().then(requestApiMarkup);
+    const hits = await apiServer.requestApi();
+    requestApiMarkup(hits);
     if (apiServer.totalHits !== 0) {
       Notiflix.Notify.success(
         `Hooray! We found ${apiServer.totalHits} images.`
       );
     }
+
     lightbox.refresh();
     loadMoreBtn.show();
-    apiServer.updatePage();
-    // apiServer.requestApi().then(requestApiMarkup);
     apiServer.incrementPage();
     emptyArray();
   } catch (error) {
@@ -60,7 +61,8 @@ async function onClickBtn() {
     loadMoreBtn.hide();
     return;
   }
-  apiServer.requestApi().then(requestApiMarkup);
+  const hits = await apiServer.requestApi();
+  requestApiMarkup(hits);
   lightbox.refresh();
   apiServer.incrementPage();
 }
